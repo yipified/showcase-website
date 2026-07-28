@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" type="image/png" href="./assets/COA.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Empire of Levinia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --gold: #b6912c;
+    --gold-deep: #8a6c1e;
+    --navy: #0f1b33;
+    --navy2: #16244a;
+    --bg: #f7f4ec;
+    --bg2: #efe9d8;
+    --card: #ffffff;
+    --ink: #16182a;
+    --ink2: #5c5a4f;
+    --border: rgba(15,27,51,0.12);
+    --shadow: 0 4px 20px rgba(15,27,51,0.08);
+    --radius: 10px;
+    --t: 0.3s ease;
+  }
+  [data-theme="dark"] {
+    --bg: #0b1120; --bg2: #101a30;
+    --card: #141f38;
+    --ink: #f1efe4; --ink2: #a9a494;
+    --border: rgba(255,255,255,0.10);
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.7;
+    transition: background var(--t), color var(--t);
+  }
+  h1, h2, .crest-motto, .lang-fb { font-family: 'Cormorant Garamond', serif; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 2.5rem; height: 68px;
+    background: var(--navy); border-bottom: 2px solid var(--gold);
+  }
+  .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-brand {
+    font-size: 1rem; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: #f1e9d2; text-decoration: none;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .est-badge {
+    font-size: 0.6rem; font-weight: 500; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gold);
+    border: 1.5px solid var(--gold); padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+  .nav-right { display: flex; gap: 0.5rem; align-items: center; }
+  .nav-btn {
+    background: transparent; border: 1.5px solid rgba(241,233,210,0.25);
+    color: #d8d2bd; padding: 0.35rem 0.9rem; border-radius: 6px;
+    cursor: pointer; font-family: 'Jost', sans-serif;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .nav-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+  .nav-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    background: transparent; border: none; cursor: pointer;
+    padding: 4px; z-index: 200;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--gold); border-radius: 2px;
+    transition: all 0.3s; 
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav-drawer {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--navy); z-index: 150; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1.2rem;
+  }
+  .mobile-nav-drawer.open { display: flex; }
+  .mobile-nav-drawer .nav-btn {
+    font-size: 1rem !important; padding: 0.8rem 2.5rem !important;
+    width: 240px; text-align: center; letter-spacing: 2px;
+  }
+  .drawer-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.4rem; color: var(--gold);
+  }
+
+  .decree-ticker {
+    position: sticky; top: 68px; z-index: 99;
+    display: flex; align-items: center; height: 38px;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    overflow: hidden; white-space: nowrap;
+  }
+  .decree-ticker span {
+    display: inline-block; padding-left: 100%;
+    animation: scroll-text 24s linear infinite;
+    font-size: 0.85rem; font-weight: 500; color: var(--gold-deep);
+  }
+  [data-theme="dark"] .decree-ticker span { color: var(--gold); }
+  @keyframes scroll-text { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-100%,0,0); } }
+  .decree-ticker:hover span { animation-play-state: paused; }
+
+  /* Main */
+  .hero {
+    min-height: calc(100vh - 68px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 4rem 2rem 5rem;
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--gold) 12%, transparent) 0%, transparent 60%),
+      var(--bg);
+  }
+  .hero-flag {
+    width: min(560px, 88vw);
+    height: auto;
+    border: 4px solid var(--gold);
+    border-radius: 4px;
+    box-shadow: var(--shadow), 0 0 0 1px var(--border);
+    margin-bottom: 2.2rem; position: relative; z-index: 1;
+    transition: transform 0.4s, box-shadow 0.4s;
+  }
+  .hero-flag:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 50px rgba(15,27,51,0.2), 0 0 0 1px var(--border); }
+  .hero-title {
+    font-size: clamp(2.6rem, 8vw, 5.6rem); font-weight: 700;
+    letter-spacing: 6px; text-transform: uppercase; color: var(--ink);
+    line-height: 1; margin-bottom: 0.5rem;
+    position: relative; z-index: 1;
+  }
+  .hero-title span { color: var(--gold-deep); }
+  [data-theme="dark"] .hero-title span { color: var(--gold); }
+  .crest-motto {
+    font-size: 1.25rem; font-style: italic; font-weight: 500;
+    color: var(--ink2); margin-bottom: 0.4rem; position: relative; z-index: 1;
+  }
+  .hero-motto {
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--ink2); margin-bottom: 2.6rem;
+    position: relative; z-index: 1;
+  }
+  .hero-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1; }
+
+  .btn {
+    padding: 0.75rem 2rem; border-radius: 6px; text-decoration: none;
+    font-family: 'Jost', sans-serif; font-size: 0.76rem; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    transition: all 0.22s; display: inline-block; cursor: pointer;
+    border: 1.5px solid transparent;
+  }
+  .btn-solid { background: var(--navy); color: #f1e9d2; border-color: var(--navy); }
+  .btn-solid:hover { background: var(--gold-deep); border-color: var(--gold-deep); color: #fff; }
+  .btn-outline { background: transparent; color: var(--ink); border-color: var(--border); }
+  .btn-outline:hover { border-color: var(--gold-deep); color: var(--gold-deep); }
+
+  /* The Sections and alt */
+  .section { padding: 5rem 2rem; border-top: 1px solid var(--border); }
+  .section.alt { background: var(--bg2); }
+  .section-inner { max-width: 980px; margin: 0 auto; }
+  .sec-header { text-align: center; margin-bottom: 3rem; }
+  .sec-label {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--gold-deep); display: block;
+    margin-bottom: 0.5rem;
+  }
+  [data-theme="dark"] .sec-label { color: var(--gold); }
+  .sec-title {
+    font-size: clamp(1.5rem, 3.5vw, 2.3rem); font-weight: 700;
+    color: var(--ink); letter-spacing: 0.5px; margin-bottom: 0.4rem;
+  }
+  .sec-sub { font-size: 0.88rem; color: var(--ink2); font-weight: 300; }
+
+  .fade { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade.in { opacity: 1; transform: none; }
+
+  /* the gov card */
+  .gov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .gov-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem 1.5rem; text-align: center;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    cursor: default;
+  }
+  .gov-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--gold); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .gov-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(15,27,51,0.14); }
+  .gov-card:hover::after { transform: scaleX(1); }
+  .gov-role {
+    font-size: 0.6rem; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold-deep); display: block;
+    margin-bottom: 0.5rem;
+  }
+  [data-theme="dark"] .gov-role { color: var(--gold); }
+  .gov-name { font-size: 1rem; font-weight: 500; color: var(--ink); line-height: 1.5; }
+  .gov-note { font-size: 0.78rem; color: var(--ink2); margin-top: 0.5rem; font-weight: 300; }
+
+  /* styiling lang */
+  .lang-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    max-width: 580px; margin: 0 auto; box-shadow: var(--shadow);
+  }
+  .lang-header {
+    padding: 0.7rem 1.5rem; background: var(--navy);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .lang-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); opacity: 0.7; }
+  .lang-title-bar { font-size: 0.68rem; font-weight: 600; color: #f1e9d2; letter-spacing: 2px; text-transform: uppercase; }
+  .lang-body { padding: 2rem; border-bottom: 1px solid var(--border); }
+  .lang-fb { font-size: 1.15rem; font-weight: 500; color: var(--ink); margin-bottom: 0.6rem; font-style: italic; }
+  .lang-en { font-size: 0.82rem; color: var(--ink2); }
+  .lang-actions { padding: 1.2rem 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  .mil-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+  .mil-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.6rem 1rem; text-align: center; box-shadow: var(--shadow);
+  }
+  .mil-card i { font-size: 1.5rem; color: var(--gold-deep); margin-bottom: 0.6rem; display: block; }
+  [data-theme="dark"] .mil-card i { color: var(--gold); }
+  .mil-card span { font-size: 0.82rem; font-weight: 500; }
+
+  /* footer before about thingy */
+  .about-text {
+    max-width: 560px; margin: 0 auto; text-align: center;
+    font-size: 0.95rem; font-weight: 300; color: var(--ink2); line-height: 2;
+  }
+
+  footer {
+    border-top: 1px solid var(--border); text-align: center; padding: 2.5rem 1rem;
+    font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--ink2); background: var(--navy);
+  }
+  footer p { color: #d8d2bd; }
+
+  .docs {
+    display: block; width: fit-content; text-decoration: none;
+    background: var(--navy); border: 1.5px solid var(--gold);
+    color: #f1e9d2; padding: 0.85rem 1.4rem; border-radius: 6px;
+    cursor: pointer; font-family: 'Jost', sans-serif;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; transition: opacity 0.2s;
+    margin: 2rem auto 0;
+  }
+  .docs:hover { opacity: 0.85; }
+
+  #topBtn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 14px 16px; opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease; cursor: pointer;
+    background: var(--navy); border: 1px solid var(--gold);
+    border-radius: 50%; text-align: center;
+  }
+  #topBtn.visible { opacity: 1; pointer-events: auto; }
+  #topBtn i { color: var(--gold); }
+
+  @media (max-width: 680px) {
+    nav { padding: 0 1rem !important; }
+    .est-badge { display: none; }
+    .nav-links-desktop { display: none !important; }
+    .hamburger { display: flex !important; }
+    .hero { padding: 2.5rem 1rem 3rem; min-height: unset; }
+    .hero-motto { font-size: 0.65rem; letter-spacing: 2px; }
+    .hero-btns { flex-direction: column; align-items: center; gap: 0.5rem; }
+    .hero-btns .btn { width: 220px; text-align: center; }
+    .gov-grid { grid-template-columns: 1fr 1fr !important; }
+    .section { padding: 3rem 1.2rem; }
+    .decree-ticker span { font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body data-theme="light">
+
+<nav>
+  <div class="nav-left">
+    <a href="#" class="nav-brand" data-i18n="brand">Empire of Levinia</a>
+    <span class="est-badge">Est. 2022</span>
+  </div>
+  <div class="nav-right nav-links-desktop">
+    <a href="#gov" class="nav-btn" data-i18n="nav-gov">Government</a>
+    <a href="#military" class="nav-btn" data-i18n="nav-military">Military</a>
+    <a href="#culture" class="nav-btn" data-i18n="nav-culture">Culture</a>
+    <a href="#about" class="nav-btn" data-i18n="nav-about">About</a>
+    <button class="nav-btn" id="dark-btn">Dark</button>
+    <button class="nav-btn" id="lang-btn">EN</button>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-nav-drawer" id="mobile-drawer">
+  <button class="drawer-close" id="drawer-close"><i class="fa-solid fa-xmark"></i></button>
+  <a href="#gov" class="nav-btn" data-i18n="nav-gov">Government</a>
+  <a href="#military" class="nav-btn" data-i18n="nav-military">Military</a>
+  <a href="#culture" class="nav-btn" data-i18n="nav-culture">Culture</a>
+  <a href="#about" class="nav-btn" data-i18n="nav-about">About</a>
+  <button class="nav-btn" id="dark-btn-mobile">Dark</button>
+  <button class="nav-btn" id="lang-btn-mobile">EN</button>
+</div>
+
+<div class="decree-ticker">
+  <span data-i18n="ticker">Long live the Empire &nbsp;&nbsp;·&nbsp;&nbsp; Ever Forward, Never Backward &nbsp;&nbsp;·&nbsp;&nbsp; Founded 1 May 2022 &nbsp;&nbsp;·&nbsp;&nbsp;</span>
+</div>
+
+<header class="hero">
+  <img src="./assets/Flag.svg" alt="Flag of Levinia" class="hero-flag">
+  <h1 class="hero-title">Empire of <span data-i18n="brand-title">Levinia</span></h1>
+  <p class="crest-motto" data-i18n="motto">"Ever Forward, Never Backward"</p>
+  <p class="hero-motto" data-i18n="submotto">Empire of Levinia · Imperia, South Carolina</p>
+  <div class="hero-btns">
+    <a href="#gov" class="btn btn-solid" data-i18n="btn-gov">Government</a>
+    <a href="#culture" class="btn btn-outline" data-i18n="btn-culture">Culture</a>
+  </div>
+</header>
+
+<div class="section alt" id="gov">
+  <div class="section-inner fade">
+    <div class="sec-header">
+      <span class="sec-label" data-i18n="gov-label">Empire of Levinia</span>
+      <h2 class="sec-title" data-i18n="gov-title">Government</h2>
+      <p class="sec-sub" data-i18n="gov-sub">An anocratic absolute monarchy, advised by an elected Parliament</p>
+    </div>
+    <div class="gov-grid">
+      <div class="gov-card">
+        <span class="gov-role" data-i18n="role-emperor">Emperor</span>
+        <span class="gov-name">Benjamin I</span>
+        <p class="gov-note" data-i18n="note-emperor">"The Great Founder"</p>
+      </div>
+      <div class="gov-card">
+        <span class="gov-role" data-i18n="role-pm">Prime Minister</span>
+        <span class="gov-name" data-i18n="vacant">Vacant</span>
+      </div>
+      <div class="gov-card">
+        <span class="gov-role" data-i18n="role-parliament">Legislature</span>
+        <span class="gov-name" data-i18n="parliament-name">Imperial Levinian Parliament</span>
+      </div>
+      <div class="gov-card">
+        <span class="gov-role" data-i18n="role-capital">Capital</span>
+        <span class="gov-name">Imperia</span>
+      </div>
+    </div>
+    <a href="#" class="docs" data-i18n="view-structure">View Government Structure</a>
+  </div>
+</div>
+
+<div class="section" id="military">
+  <div class="section-inner fade">
+    <div class="sec-header">
+      <span class="sec-label" data-i18n="mil-label">Imperial Levinian Armed Forces</span>
+      <h2 class="sec-title" data-i18n="mil-title">Military</h2>
+      <p class="sec-sub" data-i18n="mil-sub">Six service branches under the Sovereign as Commander-in-Chief</p>
+    </div>
+    <div class="mil-grid">
+      <div class="mil-card"><i class="fa-solid fa-person-rifle"></i><span data-i18n="mil-army">Army</span></div>
+      <div class="mil-card"><i class="fa-solid fa-anchor"></i><span data-i18n="mil-navy">Navy</span></div>
+      <div class="mil-card"><i class="fa-solid fa-jet-fighter"></i><span data-i18n="mil-air">Air Force</span></div>
+      <div class="mil-card"><i class="fa-solid fa-rocket"></i><span data-i18n="mil-space">Space Force</span></div>
+      <div class="mil-card"><i class="fa-solid fa-shield-halved"></i><span data-i18n="mil-cyber">Cyber &amp; Special Ops</span></div>
+      <div class="mil-card"><i class="fa-solid fa-scale-balanced"></i><span data-i18n="mil-gendarmerie">National Gendarmerie</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section alt" id="culture">
+  <div class="section-inner fade">
+    <div class="sec-header">
+      <span class="sec-label" data-i18n="lang-label">Recognised National Language</span>
+      <h2 class="sec-title" data-i18n="lang-title">American English &amp; Spanish</h2>
+      <p class="sec-sub" data-i18n="lang-sub">Official language: American English · National language: Latin American Spanish</p>
+    </div>
+    <div class="lang-card">
+      <div class="lang-header">
+        <div class="lang-dot"></div><div class="lang-dot"></div><div class="lang-dot"></div>
+        <span class="lang-title-bar" data-i18n="lang-bar">bilingual levinia</span>
+      </div>
+      <div class="lang-body">
+        <p class="lang-fb" data-i18n="lang-ex-fb">"Ever forward, never backward, the motto our people live by."</p>
+        <p class="lang-en" data-i18n="lang-ex-en">"Siempre hacia adelante, nunca hacia atrás, el lema por el que vive nuestro pueblo."</p>
+      </div>
+      <div class="lang-actions">
+        <a href="#" class="btn btn-solid" data-i18n="lang-guide">Citizenship Portal</a>
+        <a href="https://discord.gg/FWcfvJdWxS" class="btn btn-outline" data-i18n="lang-old">Join our Discord</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="about">
+  <div class="section-inner fade">
+    <div class="sec-header">
+      <span class="sec-label" data-i18n="about-label">Est. 1 May 2022</span>
+      <h2 class="sec-title" data-i18n="about-title">About Levinia</h2>
+    </div>
+    <p class="about-text" data-i18n="about-text">The Empire of Levinia is a micronation with claims in South Carolina and New York. Its capital is the city-state of Imperia, though the true seat of government is wherever the Sovereign resides. Levinia is an anocratic absolute monarchy under Emperor Benjamin I, "The Great Founder," advised by a democratically elected Parliament and a Council of Ministers.</p>
+  </div>
+</div>
+
+<footer id="footer"><p data-i18n="footer">© 2026 Empire of Levinia · Ever Forward, Never Backward</p></footer>
+
+<button id="topBtn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"><i class="fa-solid fa-angles-up" style="color: var(--gold);"></i></button>
+
+<script>
+  // Save Dark Mode Here
+  const darkBtn = document.getElementById('dark-btn');
+  let isDark = false;
+  try { isDark = localStorage.getItem('lvDark') === 'true'; } catch(e) {}
+  function applyDark() {
+    document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    darkBtn.classList.toggle('active', isDark);
+    const l = langs[langIdx];
+    darkBtn.textContent = isDark ? (i18n[l]['nav-light'] || 'Light') : (i18n[l]['nav-dark'] || 'Dark');
+  }
+  darkBtn.addEventListener('click', () => {
+    isDark = !isDark;
+    try { localStorage.setItem('lvDark', isDark); } catch(e) {}
+    applyDark();
+  });
+
+  // Ts Animation
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+
+  // i18n English / Spanish
+  const i18n = {
+    en: {
+      "brand":"Empire of Levinia","brand-title":"Levinia",
+      "motto":'"Ever Forward, Never Backward"',
+      "submotto":"Empire of Levinia · Imperia, South Carolina",
+      "nav-gov":"Government","nav-military":"Military","nav-culture":"Culture","nav-about":"About",
+      "nav-dark":"Dark","nav-light":"Light",
+      "btn-gov":"Government","btn-culture":"Culture",
+      "ticker":"Long live the Empire &nbsp;&nbsp;·&nbsp;&nbsp; Ever Forward, Never Backward &nbsp;&nbsp;·&nbsp;&nbsp; Founded 1 May 2022 &nbsp;&nbsp;·&nbsp;&nbsp;",
+      "gov-label":"Empire of Levinia","gov-title":"Government","gov-sub":"An anocratic absolute monarchy, advised by an elected Parliament",
+      "role-emperor":"Emperor","note-emperor":'"The Great Founder"',
+      "role-pm":"Prime Minister","vacant":"Vacant",
+      "role-parliament":"Legislature","parliament-name":"Imperial Levinian Parliament",
+      "role-capital":"Capital",
+      "view-structure":"View Government Structure",
+      "mil-label":"Imperial Levinian Armed Forces","mil-title":"Military","mil-sub":"Six service branches under the Sovereign as Commander-in-Chief",
+      "mil-army":"Army","mil-navy":"Navy","mil-air":"Air Force","mil-space":"Space Force","mil-cyber":"Cyber & Special Ops","mil-gendarmerie":"National Gendarmerie",
+      "lang-label":"Recognised National Language","lang-title":"American English & Spanish",
+      "lang-sub":"Official language: American English · National language: Latin American Spanish",
+      "lang-bar":"bilingual levinia",
+      "lang-ex-fb":'"Ever forward, never backward, the motto our people live by."',
+      "lang-ex-en":'"Siempre hacia adelante, nunca hacia atrás, el lema por el que vive nuestro pueblo."',
+      "lang-guide":"Citizenship Portal","lang-old":"Join our Discord",
+      "about-label":"Est. 1 May 2022","about-title":"About Levinia",
+      "about-text":'The Empire of Levinia is a micronation with claims in South Carolina and New York. Its capital is the city-state of Imperia, though the true seat of government is wherever the Sovereign resides. Levinia is an anocratic absolute monarchy under Emperor Benjamin I, "The Great Founder," advised by a democratically elected Parliament and a Council of Ministers.',
+      "footer":"© 2026 Empire of Levinia · Ever Forward, Never Backward"
+    },
+    es: {
+      "brand":"Imperio de Levinia","brand-title":"Levinia",
+      "motto":'"Siempre Hacia Adelante, Nunca Hacia Atrás"',
+      "submotto":"Imperio de Levinia · Imperia, Carolina del Sur",
+      "nav-gov":"Gobierno","nav-military":"Militar","nav-culture":"Cultura","nav-about":"Acerca de",
+      "nav-dark":"Oscuro","nav-light":"Claro",
+      "btn-gov":"Gobierno","btn-culture":"Cultura",
+      "ticker":"Larga vida al Imperio &nbsp;&nbsp;·&nbsp;&nbsp; Siempre Hacia Adelante, Nunca Hacia Atrás &nbsp;&nbsp;·&nbsp;&nbsp; Fundado el 1 de mayo de 2022 &nbsp;&nbsp;·&nbsp;&nbsp;",
+      "gov-label":"Imperio de Levinia","gov-title":"Gobierno","gov-sub":"Una monarquía absoluta anocrática, asesorada por un Parlamento electo",
+      "role-emperor":"Emperador","note-emperor":'"El Gran Fundador"',
+      "role-pm":"Primer Ministro","vacant":"Vacante",
+      "role-parliament":"Legislatura","parliament-name":"Parlamento Imperial Leviniano",
+      "role-capital":"Capital",
+      "view-structure":"Ver Estructura del Gobierno",
+      "mil-label":"Fuerzas Armadas Imperiales Levinianas","mil-title":"Militar","mil-sub":"Seis ramas de servicio bajo el Soberano como Comandante en Jefe",
+      "mil-army":"Ejército","mil-navy":"Armada","mil-air":"Fuerza Aérea","mil-space":"Fuerza Espacial","mil-cyber":"Ciber y Operaciones Especiales","mil-gendarmerie":"Gendarmería Nacional",
+      "lang-label":"Idioma Nacional Reconocido","lang-title":"Inglés Americano y Español",
+      "lang-sub":"Idioma oficial: inglés americano · Idioma nacional: español latinoamericano",
+      "lang-bar":"levinia bilingüe",
+      "lang-ex-fb":'"Siempre hacia adelante, nunca hacia atrás, el lema por el que vive nuestro pueblo."',
+      "lang-ex-en":'"Ever forward, never backward, the motto our people live by."',
+      "lang-guide":"Portal de Ciudadanía","lang-old":"Únete a nuestro Discord",
+      "about-label":"Fundado el 1 de mayo de 2022","about-title":"Acerca de Levinia",
+      "about-text":'El Imperio de Levinia es una micronación con reclamos en Carolina del Sur y Nueva York. Su capital es la ciudad-estado de Imperia, aunque la verdadera sede del gobierno es donde resida el Soberano. Levinia es una monarquía absoluta anocrática bajo el Emperador Benjamín I, "El Gran Fundador", asesorado por un Parlamento electo democráticamente y un Consejo de Ministros.',
+      "footer":"© 2026 Imperio de Levinia · Siempre Hacia Adelante, Nunca Hacia Atrás"
+    }
+  };
+
+  const langs = ['en','es'];
+  const langLabels = {en:'EN', es:'ES'};
+  let langIdx = 0;
+  try {
+    const saved = localStorage.getItem('lvLang');
+    if (saved && langs.includes(saved)) langIdx = langs.indexOf(saved);
+  } catch(e) {}
+
+  function applyLang(l) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if (i18n[l][k] !== undefined) el.innerHTML = i18n[l][k];
+    });
+    document.getElementById('lang-btn').textContent = langLabels[l];
+    darkBtn.textContent = isDark ? i18n[l]['nav-light'] : i18n[l]['nav-dark'];
+    document.documentElement.lang = l;
+  }
+
+  document.getElementById('lang-btn').addEventListener('click', () => {
+    langIdx = (langIdx + 1) % langs.length;
+    try { localStorage.setItem('lvLang', langs[langIdx]); } catch(e) {}
+    applyLang(langs[langIdx]);
+  });
+
+  applyLang(langs[langIdx]);
+  applyDark();
+</script>
+
+<script>
+  const topBtn = document.getElementById('topBtn');
+  const footer = document.getElementById('footer');
+  window.addEventListener('scroll', () => {
+    const footerTop = footer.getBoundingClientRect().top;
+    const windowHeight = window.innerHeight;
+    if (footerTop <= windowHeight) topBtn.classList.add('visible');
+    else topBtn.classList.remove('visible');
+  });
+</script>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const drawer = document.getElementById('mobile-drawer');
+  const drawerClose = document.getElementById('drawer-close');
+
+  function openDrawer() { drawer.classList.add('open'); hamburger.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeDrawer() { drawer.classList.remove('open'); hamburger.classList.remove('open'); document.body.style.overflow = ''; }
+
+  hamburger.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+  drawerClose.addEventListener('click', closeDrawer);
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
+
+  const darkBtnMobile = document.getElementById('dark-btn-mobile');
+  if (darkBtnMobile) {
+    darkBtnMobile.addEventListener('click', () => {
+      document.getElementById('dark-btn').click();
+      darkBtnMobile.textContent = document.getElementById('dark-btn').textContent;
+    });
+  }
+  const langBtnMobile = document.getElementById('lang-btn-mobile');
+  if (langBtnMobile) {
+    langBtnMobile.addEventListener('click', () => {
+      document.getElementById('lang-btn').click();
+      langBtnMobile.textContent = document.getElementById('lang-btn').textContent;
+    });
+  }
+</script>
+</body>
+</html>
